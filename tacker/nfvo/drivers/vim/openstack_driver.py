@@ -507,12 +507,14 @@ class OpenStack_Driver(abstract_vim_driver.VimAbstractDriver,
         updated_port_chain = dict()
 
         pc_info = neutronclient_.port_chain_show(chain_id)
-        if set(fc_ids) != set(pc_info['port_chain']['flow_classifiers']):
-            updated_port_chain['flow_classifiers'] = fc_ids
+       #if set(fc_ids) != set(pc_info['port_chain']['flow_classifiers']):
+       #updated_port_chain['flow_classifiers'] = fc_ids
         old_ppgs = pc_info['port_chain']['port_pair_groups']
-        old_ppgs_dict = {neutronclient_.
+        old_ppgs_dict = {neutronclient_. # VNF의 이름 : ppg_id 매핑 dict
                     port_pair_group_show(ppg_id)['port_pair_group']['name'].
-                    split('-')[0]: ppg_id for ppg_id in old_ppgs}
+                    split('-')[0]: ppg_id for ppg_id in old_ppgs} #VNF의 이름
+        ## old_ppgs_dict = {VNF1 : ppg_id1, VN2 : ppg_id2}
+        
         past_ppgs_dict = old_ppgs_dict.copy()
         try:
             for vnf in vnfs:
@@ -614,6 +616,83 @@ class OpenStack_Driver(abstract_vim_driver.VimAbstractDriver,
                         neutronclient_.port_pair_delete(pp_id)
         return pc_id
 
+    def update_chain_ha(self, chain_id, vnf, symmetrical=None, auth_attr=None):
+    
+        # chain_id = ""
+            # neutron 내에서 chain을 표현.
+            # 수정이 필요한 chain의 id <= (nfvo_plugin에서는 vnffg_db 로부터 얻어와야하는 정보)
+        # vnf = {'name':'VNF1', 'connection_points':'CP12', }
+            # scaling이 된 vnf의 정보 
+
+        if not auth_attr:
+            LOG.warning("auth information required for n-sfc driver")
+            return None
+
+        neutronclient_ = NeutronClient(auth_attr)
+        port_pairs_list = neutronclient_.port_pair_list()
+        port_pair_groups_list = neutronclient_.port_pair_group_list()
+        port_chains_list = neutronclient_.port_chain_list()
+        new_ppgs = []
+        updated_port_chain = dict()
+
+        pc_info = neutronclient_.port_chain_show(chain_id)
+            # 입력인 chain_id로 port_chain_info 가져오기
+
+        old_ppgs = pc_info['port_chain']['port_pair_groups']
+            # old_ppgs = ["ppg_id1", "ppg_id2"]
+        
+        old_ppgs_dict = {neutronclient_.port_pair_group_show(ppg_id)['port_pair_group']['name'].split('-')[0]: ppg_id for ppg_id in old_ppgs}
+            # old_ppgs_dict = {VNF1 : ppg_id1, VNF2 : ppg_id2}
+
+        try:
+            if vnf['name'] in old_ppgs_dict:
+                updating_ppg_id = old_ppgs_dict[vnf['name']]
+                    # updating_ppg_id = "ppg_id"        
+                updating_ppg_dict = neutronclient_.port_pair_group_show(updating_ppg_id)
+                    # updating_ppg_dict 생성
+    
+                cp_list = vnf[CONNECTION_POINT]
+                    ### ?? vnf의 dict 구조를 파악해야함
+
+                num_cps = len(cp_list)
+                if num_cps not in [1, 2]:
+                    LOG.warning("Chain update failed due to wrong number "
+                                "of connection points: expected [1 | 2],"
+                                "got %(cps)d", {'cps': num_cps})
+                    raise nfvo.UpdateChainException(
+                        message="Invalid number of connection points")
+                if num_cps == 1:
+                    ingress = cp_list[0]
+                    egress = cp_list[0]
+                else:
+                    ingress = cp_list[0]
+                    egress = cp_list[1]
+
+                port_pair = {}
+                port_pair['name'] = vnf['name'] + '-connection-points-scaled-out'
+                port_pair['description'] = 'scaled port pair for' + vnf['name']
+                port_pair['ingress'] = ingress
+                port_pair['egress'] = egress
+                port_pair_id = neutronclient_.port_pair_create(port_pair)
+                                               
+                updating_ppg_dict['port_pairs'].append(port_pair_id)
+                updated_ppg = neutronclient_.port_pair_group_update(ppg_id=updating_ppg_id, ppg_dict=updating_ppg_dict)
+                    # ppg update
+                return updated_ppg
+
+            else:
+                raise nfvo.UpdateChainException(
+                    message="The VNF is not included in the chain")
+                    # 기존의 chain에 update하려고 하는 vnf가 없으면 에러
+
+        except nfvo.UpdateChainException as e:
+            raise e
+
+
+        return pc_id
+
+
+    
     def delete_chain(self, chain_id, auth_attr=None):
         if not auth_attr:
             LOG.warning("auth information required for n-sfc driver")
@@ -978,3 +1057,17 @@ class NeutronClient(object):
         except nc_exceptions.NotFound:
             LOG.warning('port pair group %s not found', ppg_id)
             raise ValueError('port pair group %s not found' % ppg_id)
+
+# 추가
+    def port_pair_group_update(self, ppg_id, ppg_dict):
+        try:
+            port_pair_group = self.client.update_sfc_port_pair_group(ppg_id, {'port_pair_group' : ppg_dict})
+            if port_pair_group is None:
+                raise ValueError('port pair group %s not found' % ppg_id)
+            return port_pair_group
+
+        except nc_exceptions.NotFound:
+            LOG.warning('port pair group %s not found', ppg_id)
+            raise ValueError('port pair group %s not found' % ppg_id)
+
+        
