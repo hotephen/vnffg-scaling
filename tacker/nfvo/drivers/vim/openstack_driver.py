@@ -688,10 +688,6 @@ class OpenStack_Driver(abstract_vim_driver.VimAbstractDriver,
         except nfvo.UpdateChainException as e:
             raise e
 
-
-        return pc_id
-
-
     
     def delete_chain(self, chain_id, auth_attr=None):
         if not auth_attr:
