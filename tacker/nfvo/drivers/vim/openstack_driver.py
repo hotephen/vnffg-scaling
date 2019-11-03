@@ -674,7 +674,6 @@ class OpenStack_Driver(abstract_vim_driver.VimAbstractDriver,
             else:
                 raise nfvo.UpdateChainException(
                     message="The VNF is not included in the chain")
-                    # 기존의 chain에 update하려고 하는 vnf가 없으면 에러
 
         except nfvo.UpdateChainException as e:
             raise e
