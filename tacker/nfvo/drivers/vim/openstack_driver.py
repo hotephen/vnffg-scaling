@@ -621,8 +621,7 @@ class OpenStack_Driver(abstract_vim_driver.VimAbstractDriver,
         # chain_id = ""
             # neutron 내에서 chain을 표현.
             # 수정이 필요한 chain의 id <= (nfvo_plugin에서는 vnffg_db 로부터 얻어와야하는 정보)
-        # vnf = {'name':'VNF1', 'connection_points':'CP12', }
-            # scaling이 된 vnf의 정보 
+       
 
         if not auth_attr:
             LOG.warning("auth information required for n-sfc driver")
