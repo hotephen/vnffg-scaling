@@ -630,7 +630,7 @@ class OpenStack_Driver(abstract_vim_driver.VimAbstractDriver,
         updated_port_chain = dict()
 
         pc_info = neutronclient_.port_chain_show(chain_id)
-            # 입력인 chain_id로 port_chain_info 가져오기
+            # Get port_chain_info from chain_id
 
         old_ppgs = pc_info['port_chain']['port_pair_groups']
             # old_ppgs = ["ppg_id1", "ppg_id2"]
