@@ -616,7 +616,7 @@ class OpenStack_Driver(abstract_vim_driver.VimAbstractDriver,
                         neutronclient_.port_pair_delete(pp_id)
         return pc_id
 
-    def update_chain_ha(self, chain_id, vnf, symmetrical=None, auth_attr=None):
+    def scale_chain(self, chain_id, vnf, symmetrical=None, auth_attr=None):
     
         if not auth_attr:
             LOG.warning("auth information required for n-sfc driver")
