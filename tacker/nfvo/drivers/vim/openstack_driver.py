@@ -643,11 +643,8 @@ class OpenStack_Driver(abstract_vim_driver.VimAbstractDriver,
                 updating_ppg_id = old_ppgs_dict[vnf['name']]
                     # updating_ppg_id = "ppg_id"        
                 updating_ppg_dict = neutronclient_.port_pair_group_show(updating_ppg_id)
-                    # updating_ppg_dict 생성
-    
+                        
                 cp_list = vnf[CONNECTION_POINT]
-                    ### ?? vnf의 dict 구조를 파악해야함
-
                 num_cps = len(cp_list)
                 if num_cps not in [1, 2]:
                     LOG.warning("Chain update failed due to wrong number "
