@@ -618,11 +618,6 @@ class OpenStack_Driver(abstract_vim_driver.VimAbstractDriver,
 
     def update_chain_ha(self, chain_id, vnf, symmetrical=None, auth_attr=None):
     
-        # chain_id = ""
-            # neutron 내에서 chain을 표현.
-            # 수정이 필요한 chain의 id <= (nfvo_plugin에서는 vnffg_db 로부터 얻어와야하는 정보)
-       
-
         if not auth_attr:
             LOG.warning("auth information required for n-sfc driver")
             return None
