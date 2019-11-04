@@ -507,13 +507,10 @@ class OpenStack_Driver(abstract_vim_driver.VimAbstractDriver,
         updated_port_chain = dict()
 
         pc_info = neutronclient_.port_chain_show(chain_id)
-       #if set(fc_ids) != set(pc_info['port_chain']['flow_classifiers']):
-       #updated_port_chain['flow_classifiers'] = fc_ids
         old_ppgs = pc_info['port_chain']['port_pair_groups']
-        old_ppgs_dict = {neutronclient_. # VNF의 이름 : ppg_id 매핑 dict
+        old_ppgs_dict = {neutronclient_.
                     port_pair_group_show(ppg_id)['port_pair_group']['name'].
-                    split('-')[0]: ppg_id for ppg_id in old_ppgs} #VNF의 이름
-        ## old_ppgs_dict = {VNF1 : ppg_id1, VN2 : ppg_id2}
+                    split('-')[0]: ppg_id for ppg_id in old_ppgs}
         
         past_ppgs_dict = old_ppgs_dict.copy()
         try:
