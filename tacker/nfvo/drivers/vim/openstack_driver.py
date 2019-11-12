@@ -667,7 +667,6 @@ class OpenStack_Driver(abstract_vim_driver.VimAbstractDriver,
                 updated_ppg = neutronclient_.port_pair_group_update(ppg_id=updating_ppg_id, ppg_dict=updating_ppg_dict)
                     # ppg update
                 return updated_ppg
-
             else:
                 raise nfvo.UpdateChainException(
                     message="The VNF is not included in the chain")
