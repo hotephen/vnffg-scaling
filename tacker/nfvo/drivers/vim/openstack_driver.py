@@ -1041,7 +1041,6 @@ class NeutronClient(object):
             LOG.warning('port pair group %s not found', ppg_id)
             raise ValueError('port pair group %s not found' % ppg_id)
 
-# 추가
     def port_pair_group_update(self, ppg_id, ppg_dict):
         try:
             port_pair_group = self.client.update_sfc_port_pair_group(ppg_id, {'port_pair_group' : ppg_dict})
