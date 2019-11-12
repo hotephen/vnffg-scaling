@@ -658,7 +658,7 @@ class OpenStack_Driver(abstract_vim_driver.VimAbstractDriver,
 
                 port_pair = {}
                 port_pair['name'] = vnf['name'] + '-connection-points-scaled-out'
-                port_pair['description'] = 'scaled port pair for' + vnf['name']
+                port_pair['description'] = 'scaled-out port pair for' + vnf['name']
                 port_pair['ingress'] = ingress
                 port_pair['egress'] = egress
                 port_pair_id = neutronclient_.port_pair_create(port_pair)
