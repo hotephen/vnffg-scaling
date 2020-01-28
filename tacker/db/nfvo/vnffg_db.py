@@ -271,6 +271,9 @@ class VnffgPluginDbMixin(vnffg.VNFFGPluginBase, db_base.CommonDbMixin):
             template_db = self._get_resource(context, VnffgTemplate,
                                              vnffgd_id)
             context.session.delete(template_db)
+#TODO: 
+    def get_chain_id(self, context, vnffg_id, fields=None):
+        
 
     def get_classifier(self, context, classifier_id, fields=None):
         classifier_db = self._get_resource(context, VnffgClassifier,

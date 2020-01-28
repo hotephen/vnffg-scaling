@@ -614,7 +614,9 @@ class OpenStack_Driver(abstract_vim_driver.VimAbstractDriver,
         return pc_id
 
     def scale_chain(self, chain_id, vnf, symmetrical=None, auth_attr=None):
-    
+        # chain_id = asdf1234
+        # vnf = {“name” : VNF1_name, “CONNECTION_POINT” : CP,}
+
         if not auth_attr:
             LOG.warning("auth information required for n-sfc driver")
             return None
@@ -632,7 +634,9 @@ class OpenStack_Driver(abstract_vim_driver.VimAbstractDriver,
         old_ppgs = pc_info['port_chain']['port_pair_groups']
             # old_ppgs = ["ppg_id1", "ppg_id2"]
         
-        old_ppgs_dict = {neutronclient_.port_pair_group_show(ppg_id)['port_pair_group']['name'].split('-')[0]: ppg_id for ppg_id in old_ppgs}
+        old_ppgs_dict = {neutronclient_.port_pair_group_show(ppg_id)
+            ['port_pair_group']['name'].split('-')[0]: \
+            ppg_id for ppg_id in old_ppgs}
             # old_ppgs_dict = {VNF1 : ppg_id1, VNF2 : ppg_id2}
 
         try:
@@ -641,6 +645,7 @@ class OpenStack_Driver(abstract_vim_driver.VimAbstractDriver,
                     # updating_ppg_id = "ppg_id"        
                 updating_ppg_dict = neutronclient_.port_pair_group_show(updating_ppg_id)
                         
+#TODO:          CONNECTION_POINT =  manual typing 
                 cp_list = vnf[CONNECTION_POINT]
                 num_cps = len(cp_list)
                 if num_cps not in [1, 2]:
@@ -665,7 +670,7 @@ class OpenStack_Driver(abstract_vim_driver.VimAbstractDriver,
                                                
                 updating_ppg_dict['port_pairs'].append(port_pair_id)
                 updated_ppg = neutronclient_.port_pair_group_update(ppg_id=updating_ppg_id, ppg_dict=updating_ppg_dict)
-                    # ppg update
+                    # call port_pair_group_update method
                 return updated_ppg
             else:
                 raise nfvo.UpdateChainException(
