@@ -363,7 +363,7 @@ class NfvoPlugin(nfvo_db_plugin.NfvoPluginDb, vnffg_db.VnffgPluginDbMixin,
                                              fc=item['match'],
                                              auth_attr=vim_obj['auth_cred']))
             sfc_id, path_id = self._vim_drivers.invoke(driver_type,
-                                              'create_chain',
+                                              'create_chain', #TODO:
                                               name=vnffg_dict['name'],
                                               path_id=sfc['path_id'],
                                               vnfs=sfc['chain'],
@@ -468,7 +468,7 @@ class NfvoPlugin(nfvo_db_plugin.NfvoPluginDb, vnffg_db.VnffgPluginDbMixin,
                                          fc=item,
                                          auth_attr=vim_obj['auth_cred']))
             n_sfc_chain_id = self._vim_drivers.invoke(
-                driver_type, 'update_chain',
+                driver_type, 'update_chain', #TODO:
                 vnfs=sfc['chain'], fc_ids=fc_ids,
                 chain_id=sfc['instance_id'], auth_attr=vim_obj['auth_cred'])
         except Exception:
